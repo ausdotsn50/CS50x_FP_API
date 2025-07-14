@@ -19,11 +19,6 @@ app.use(express.json()); // A built-in middleware
 const PORT = process.env.PORT || 5001; // Default port: 5001
 
 // Initializing the database
-/* Key words: 
-        NOT EXIST
-        SERIAL pseudo-type simplifies generating auto-incrementing sequences for columns
-        DATE NOT NUL DEFAULT CURRENT_DATE
-*/
 async function initDB() {
     try {
         await sql`CREATE TABLE IF NOT EXISTS products(
