@@ -9,16 +9,15 @@ router.get("/:userId", async (req, res) => {
     const { userId } = req.params;
 
     const ordersPUser = await sql`
-        SELECT customers.name, customers.address, products.item, products.type, 
-            products.base_price, products.quantity, orders.created_at FROM orders
-
+        SELECT name, address, item, type,
+            base_price, quantity, created_at FROM orders
             JOIN customers ON orders.customer_id = customers.id
             JOIN products ON orders.product_id = products.id
             WHERE orders.user_id = ${userId}
     `;
 
     console.log("Successfully fetched orders from userId: ", userId);
-    res.status(200).json(orders); // reponse status
+    res.status(200).json(ordersPUser); // reponse status
   } catch (error) {
     console.error("Error fetching orders for userId: ", userId, ". Error is: ", error);
     res.status(500).send("Internal server error");
@@ -33,18 +32,18 @@ router.get("/summary/:userId", async (req, res) => {
     const wString = "walk in";
 
     const deliverCount = await sql`
-        SELECT COUNT(*) FROM orders WHERE type = ${dString} AND created_at = CURRENT_DATE
+        SELECT COUNT(*) FROM orders WHERE type = ${dString} AND user_id = ${userId}
     `;
 
     const walkinCount = await sql`
-        SELECT COUNT(*) FROM orders WHERE type = ${wString} AND created_at = CURRENT_DATE
+        SELECT COUNT(*) FROM orders WHERE type = ${wString} AND user_id = ${userId}
     `;
 
     console.log("Successfully fetched summary of from userId: ", userId);
     res.status(200).json({
         revenue: 100.00,
-        deliver: deliverCount[0].type,
-        walkins: walkinCount[0].type,
+        deliver: deliverCount,
+        walkins: walkinCount,
     }); // response status
   } catch (error) {
     console.error("Error fetching summary of orders for userId: ", userId, ". Error is: ", error);
