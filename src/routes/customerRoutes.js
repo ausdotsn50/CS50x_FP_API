@@ -16,7 +16,7 @@ router.post("/", async(req,res) => {
         `;
         console.log("Customer added successfully");
     } catch(error) {
-        console.log("Post method for customers error");
+        console.error("Post method for customers error");
     }
 });
 

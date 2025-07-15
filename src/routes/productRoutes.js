@@ -15,7 +15,7 @@ router.post("/", async(req,res) => {
         console.log(product);
         console.log("Product added successfully");
     } catch(error) {    
-        console.log("Post method for products error");
+        console.error("Post method for products error");
     }
 });
 

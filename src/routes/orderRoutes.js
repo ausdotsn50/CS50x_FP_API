@@ -9,7 +9,7 @@ router.get("/:userId", async (req, res) => {
     const { userId } = req.params;
 
     const ordersPUser = await sql`
-        SELECT name, address, item, type,
+        SELECT orders.id, name, address, item, type,
             base_price, quantity, created_at FROM orders
             JOIN customers ON orders.customer_id = customers.id
             JOIN products ON orders.product_id = products.id
@@ -49,6 +49,30 @@ router.get("/summary/:userId", async (req, res) => {
     console.error("Error fetching summary of orders for userId: ", userId, ". Error is: ", error);
     res.status(500).send("Internal server error");
   }
+});
+
+router.delete("/:id", async(req, res) => {
+  try {
+    const { id } = req.params;
+
+    // checker for non-integer IDs to avoid crashing
+    if(isNaN(parseInt(id))) {
+      return res.status(400).json({ message : "Invalid order ID"});
+    }
+
+    const result = await sql`
+      DELETE FROM orders WHERE id = ${id} RETURNING *
+    `;
+
+    if(result.length === 0) {
+      return res.status(404).json({ message: "Order not found"});
+    }
+    res.status(200).json({ message: "Order deleted successfully "});
+  } catch(error) {
+      console.error("Error deleting the transaction: ", error);
+      res.status(500).json({ message : "Internal server error"});
+  }
+  
 });
 
 export default router;
