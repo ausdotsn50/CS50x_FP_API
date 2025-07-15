@@ -42,7 +42,7 @@ router.get("/summary/:userId", async (req, res) => {
     console.log("Successfully fetched summary of from userId: ", userId);
     res.status(200).json({
         revenue: 100.00,
-        deliver: deliverCount,
+        delivers: deliverCount,
         walkins: walkinCount,
     }); // response status
   } catch (error) {
