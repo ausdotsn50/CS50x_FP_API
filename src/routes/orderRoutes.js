@@ -30,7 +30,19 @@ router.get("/summary/:userId", async (req, res) => {
 
     const dString = "deliver";
     const wString = "walk in";
-
+    
+    const revTotal = await sql`
+      SELECT SUM((base_price + 
+        CASE WHEN type = ${dString} 
+          THEN 5 
+          ELSE 0
+        END) * quantity) AS rev
+      FROM orders
+        JOIN customers ON orders.customer_id = customers.id
+        JOIN products ON orders.product_id = products.id
+        WHERE orders.user_id = ${userId}
+    `;
+    
     const deliverCount = await sql`
         SELECT COUNT(*) FROM orders WHERE type = ${dString} AND user_id = ${userId}
     `;
@@ -39,11 +51,26 @@ router.get("/summary/:userId", async (req, res) => {
         SELECT COUNT(*) FROM orders WHERE type = ${wString} AND user_id = ${userId}
     `;
 
+    const trc = await sql`
+      SELECT name, address, quantity, item, ((base_price + 
+        CASE WHEN type = ${dString} 
+          THEN 5 
+          ELSE 0
+        END) * quantity) AS rev
+      FROM orders
+        JOIN customers ON orders.customer_id = customers.id
+        JOIN products ON orders.product_id = products.id
+        WHERE orders.user_id = ${userId}
+      ORDER by rev DESC
+      LIMIT 1
+    `;
+
     console.log("Successfully fetched summary of from userId: ", userId);
     res.status(200).json({
-        revenue: 100.00,
+        revenue: revTotal,
         delivers: deliverCount,
         walkins: walkinCount,
+        topRevContri: trc,
     }); // response status
   } catch (error) {
     console.error("Error fetching summary of orders for userId: ", userId, ". Error is: ", error);
