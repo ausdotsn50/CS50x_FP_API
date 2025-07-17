@@ -4,6 +4,8 @@ import { sql } from "../config/db.js";
 const router = express.Router(); // Route: /api/orders
 
 // Able to fetch orders by user id
+
+// Route to get all orders of particular user
 router.get("/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -24,6 +26,7 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+// Route to get the summary of orders of particular user
 router.get("/summary/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -78,6 +81,7 @@ router.get("/summary/:userId", async (req, res) => {
   }
 });
 
+// Route to delete an order
 router.delete("/:id", async(req, res) => {
   try {
     const { id } = req.params;
@@ -101,5 +105,20 @@ router.delete("/:id", async(req, res) => {
   }
   
 });
+
+/* 
+// Create orders for a particular user
+router.post("/:userId", async(req,res) => {
+  try {
+    const {userId} = req.params;
+
+    const newOrder = await sql`
+      INSERT INTO orders
+    `;
+  } catch(error) {
+
+  }
+});
+*/
 
 export default router;
