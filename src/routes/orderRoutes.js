@@ -3,8 +3,6 @@ import { sql } from "../config/db.js";
 
 const router = express.Router(); // Route: /api/orders
 
-// Able to fetch orders by user id
-
 // Route to get all orders of particular user
 router.get("/:userId", async (req, res) => {
   try {
