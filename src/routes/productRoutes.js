@@ -3,19 +3,22 @@ import { sql } from "../config/db.js";
 
 const router = express.Router();
 
-router.post("/", async(req,res) => {
+// Retrieves all products owned by a user
+router.get("/:userId", async(req,res) => {
     try {
-        const { user_id, item, base_price } = req.body; // add something for error handling
-        
-        const product = await sql`
-            INSERT INTO products(user_id, item, base_price)
-            VALUES (${user_id}, ${item}, ${base_price})
-            RETURNING *
+        const { userId } = req.params;
+
+        const products = await sql`
+            SELECT item FROM products
+            WHERE user_id = ${userId}
         `;
-        console.log(product);
-        console.log("Product added successfully");
-    } catch(error) {    
-        console.error("Post method for products error");
+
+        // Success message
+        console.log("Successfully fetched products from userId: ", userId);
+        res.status(200).json(products);
+    } catch(error) {
+        console.error("Error fetching products for userId: ", userId, ". Error is: ", error);
+        res.status(500).send("Internal server error");
     }
 });
 
