@@ -6,7 +6,6 @@ const router = express.Router();
 // Router: api/customers
 
 // customer route temp ok
-// To do: finish search/filter functionality
 router.get("/:userId", async(req,res) => {
     try {
         const { userId } = req.params;
@@ -21,6 +20,29 @@ router.get("/:userId", async(req,res) => {
         console.error("Error fetching customers of userId: ", userId, ". Error is: ", error);
         res.status(500).send("Internal server error");
     }
+});
+
+// To do: polish this add customer route
+router.post("/:userId", async(req,res) => {
+  try{
+    const { user_id, name, address} = req.body;
+
+    if(!user_id || !name || !address) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const addCustomer = await sql `
+      INSERT INTO customers(user_id, name, address)
+            VALUES (${user_id}, ${name}, ${address})
+            RETURNING *
+    `;
+
+    console.log("Successfully added a customer for userId: ", user_id);
+    res.status(200).json(addCustomer);
+  } catch(error) {
+    console.error("Error adding a customer for userId: ", userId, ". Error is: ", error);
+    res.status(500).send("Internal server error");
+  }
 });
 
 router.delete("/:id", async(req, res) => {
