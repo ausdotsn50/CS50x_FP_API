@@ -34,12 +34,6 @@ router.get("/", async(req,res) => {
     }
 });
 
-
-
-
-
-
-
 router.post("/", async(req,res) => {
     // get the fields that user wants to send
     try {

@@ -112,16 +112,26 @@ router.delete("/:id", async(req, res) => {
 });
 
 // Create orders for a particular user
-router.post("/:userId", async(req,res) => {
+router.post("/", async(req,res) => {
   try {
-    const {userId} = req.params;
+    const {userId, product_id, customer_id, quantity, type} = req.body;
+
+    if(!userId || !product_id || !customer_id || quantity === undefined) {
+      return res.status(400).json({ message : "All fields are required"});
+    }
 
     const createNewOrder = await sql`
-      INSERT INTO orders
+      INSERT INTO orders(user_id, product_id, customer_id, quantity, type)
+        VALUES (${userId}, ${product_id}, ${customer_id}, ${quantity}, ${type})
+        RETURNING *
     `;
-  } catch(error) {
 
-  }
+    console.log(createNewOrder[0])
+    res.status(201).json(createNewOrder[0]);
+  } catch(error) {
+    console.error("Error creating the order", error);
+    res.status(500).json({ message: "Internal server error" });
+  } 
 });
 
 export default router;
