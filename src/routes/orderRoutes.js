@@ -52,7 +52,7 @@ router.get("/summary/:userId", async (req, res) => {
         SELECT COUNT(*) FROM orders WHERE type = ${wString} AND user_id = ${userId}
     `;
 
-    const trc = await sql`
+    const trcQuery = await sql`
       SELECT name, address, quantity, item, ((base_price + 
         CASE WHEN type = ${dString} 
           THEN 5 
@@ -65,6 +65,14 @@ router.get("/summary/:userId", async (req, res) => {
       ORDER by rev DESC
       LIMIT 1
     `;
+
+    const trc = trcQuery[0] ?? [{
+      name: '',
+      address: '',
+      item: '',
+      quantity: 0,
+      rev: 0,
+    }];
 
     console.log("Successfully fetched summary of from userId: ", userId);
     res.status(200).json({
@@ -98,25 +106,22 @@ router.delete("/:id", async(req, res) => {
     }
     res.status(200).json({ message: "Order deleted successfully "});
   } catch(error) {
-      console.error("Error deleting the transaction: ", error);
+      console.error("Error deleting the order: ", error);
       res.status(500).json({ message : "Internal server error"});
   }
-  
 });
 
-/* 
 // Create orders for a particular user
 router.post("/:userId", async(req,res) => {
   try {
     const {userId} = req.params;
 
-    const newOrder = await sql`
+    const createNewOrder = await sql`
       INSERT INTO orders
     `;
   } catch(error) {
 
   }
 });
-*/
 
 export default router;

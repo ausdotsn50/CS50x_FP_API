@@ -9,7 +9,7 @@ router.get("/:userId", async(req,res) => {
         const { userId } = req.params;
 
         const products = await sql`
-            SELECT item FROM products
+            SELECT id, item FROM products
             WHERE user_id = ${userId}
         `;
 
