@@ -3,7 +3,8 @@ import { sql } from "../config/db.js";
 
 const router = express.Router(); // Route: /api/orders
 const dateToday = new Date();
-const dateTom = dateToday.setDate(dateToday.getDate() + 1);
+// setting to a different date
+// dateToday.setDate(dateToday.getDate() + 1);
 
 // Route to get all orders of particular user
 router.get("/:userId", async (req, res) => {
