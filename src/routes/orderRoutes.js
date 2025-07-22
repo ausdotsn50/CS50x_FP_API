@@ -2,6 +2,8 @@ import express from "express";
 import { sql } from "../config/db.js";
 
 const router = express.Router(); // Route: /api/orders
+const dateToday = new Date();
+const dateTom = dateToday.setDate(dateToday.getDate() + 1);
 
 // Route to get all orders of particular user
 router.get("/:userId", async (req, res) => {
@@ -25,6 +27,7 @@ router.get("/:userId", async (req, res) => {
 });
 
 // Route to get the summary of orders of particular user
+// summary restricted for today
 router.get("/summary/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -41,15 +44,15 @@ router.get("/summary/:userId", async (req, res) => {
       FROM orders
         JOIN customers ON orders.customer_id = customers.id
         JOIN products ON orders.product_id = products.id
-        WHERE orders.user_id = ${userId}
+        WHERE orders.user_id = ${userId} AND created_at = ${dateToday}
     `;
     
     const deliverCount = await sql`
-        SELECT COUNT(*) FROM orders WHERE type = ${dString} AND user_id = ${userId}
+        SELECT COUNT(*) FROM orders WHERE type = ${dString} AND user_id = ${userId} AND created_at = ${dateToday}
     `;
 
     const walkinCount = await sql`
-        SELECT COUNT(*) FROM orders WHERE type = ${wString} AND user_id = ${userId}
+        SELECT COUNT(*) FROM orders WHERE type = ${wString} AND user_id = ${userId} AND created_at = ${dateToday}
     `;
 
     const trcQuery = await sql`
@@ -61,7 +64,7 @@ router.get("/summary/:userId", async (req, res) => {
       FROM orders
         JOIN customers ON orders.customer_id = customers.id
         JOIN products ON orders.product_id = products.id
-        WHERE orders.user_id = ${userId}
+        WHERE orders.user_id = ${userId} AND created_at = ${dateToday}
       ORDER by rev DESC
       LIMIT 1
     `;
