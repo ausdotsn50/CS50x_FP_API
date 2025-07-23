@@ -22,4 +22,28 @@ router.get("/:userId", async(req,res) => {
     }
 });
 
+// Route to delete a product
+router.delete("/:id", async(req, res) => {
+  try {
+    const { id } = req.params;
+
+    // checker for non-integer IDs to avoid crashing
+    if(isNaN(parseInt(id))) {
+      return res.status(400).json({ message : "Invalid product ID"});
+    }
+
+    const result = await sql`
+      DELETE FROM products WHERE id = ${id} RETURNING *
+    `;
+
+    if(result.length === 0) {
+      return res.status(404).json({ message: "Product not found"});
+    }
+    res.status(200).json({ message: "Product deleted successfully "});
+  } catch(error) {
+      console.error("Error deleting the product: ", error);
+      res.status(500).json({ message : "Internal server error"});
+  }
+});
+
 export default router;

@@ -17,6 +17,7 @@ router.get("/:userId", async (req, res) => {
             JOIN customers ON orders.customer_id = customers.id
             JOIN products ON orders.product_id = products.id
             WHERE orders.user_id = ${userId}
+            ORDER BY created_at DESC
     `;
 
     console.log("Successfully fetched orders from userId: ", userId);
