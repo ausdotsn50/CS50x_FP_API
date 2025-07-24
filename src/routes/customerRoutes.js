@@ -1,11 +1,9 @@
 import express from "express";
 import { sql } from "../config/db.js";
 
-const router = express.Router();
+const router = express.Router(); // Router: api/customers
 
-// Router: api/customers
-
-// customer route temp ok
+// Retrieves all the customers a particular user has
 router.get("/:userId", async(req,res) => {
     try {
         const { userId } = req.params;
@@ -22,7 +20,7 @@ router.get("/:userId", async(req,res) => {
     }
 });
 
-// To do: polish this add customer route
+// Route to add/create a new customer for a user
 router.post("/:userId", async(req,res) => {
   try{
     const { user_id, name, address} = req.body;

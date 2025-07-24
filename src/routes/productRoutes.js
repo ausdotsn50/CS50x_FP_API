@@ -1,7 +1,7 @@
 import express from "express";
 import { sql } from "../config/db.js";
 
-const router = express.Router();
+const router = express.Router(); // Route: api/products
 
 // Retrieves all products owned by a user
 router.get("/:userId", async(req,res) => {
@@ -43,6 +43,29 @@ router.delete("/:id", async(req, res) => {
   } catch(error) {
       console.error("Error deleting the product: ", error);
       res.status(500).json({ message : "Internal server error"});
+  }
+});
+
+// Route to create a new product for a particular user
+router.post("/", async(req,res) => {
+  try {
+    const {userId, item, base_price} = req.body;
+
+    if(!userId || !item || base_price === undefined) { // undefined === has not been given a value
+      return res.status(400).json({ message : "All fields are required"});
+    }
+
+    const createNewProduct = await sql`
+      INSERT INTO products(user_id, item, base_price)
+        VALUES (${userId}, ${item}, ${base_price})
+        RETURNING *
+    `;
+
+    console.log(createNewProduct[0])
+    res.status(201).json(createNewProduct[0]);
+  } catch(error) {  
+    console.error("Error creating the product", error);
+    res.status(500).json({ message: "Internal server error"});
   }
 });
 
