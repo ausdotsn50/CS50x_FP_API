@@ -21,7 +21,7 @@ router.get("/:userId", async(req,res) => {
 });
 
 // Route to add/create a new customer for a user
-router.post("/:userId", async(req,res) => {
+router.post("/", async(req,res) => {
   try{
     const { user_id, name, address} = req.body;
 

@@ -38,8 +38,8 @@ async function initDB() {
         await sql `CREATE TABLE IF NOT EXISTS orders(
             id SERIAL PRIMARY KEY,
             user_id VARCHAR(255) NOT NULL,
-            product_id INT NOT NULL REFERENCES products(id),
-            customer_id INT NOT NULL REFERENCES customers(id),
+            product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+            customer_id INT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
             quantity INT NOT NULL,
             type VARCHAR(255) NOT NULL,
             created_at DATE NOT NULL DEFAULT CURRENT_DATE
