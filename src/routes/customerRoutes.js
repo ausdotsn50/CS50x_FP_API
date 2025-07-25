@@ -23,19 +23,19 @@ router.get("/:userId", async(req,res) => {
 // Route to add/create a new customer for a user
 router.post("/", async(req,res) => {
   try{
-    const { user_id, name, address} = req.body;
+    const { userId, name, address} = req.body;
 
-    if(!user_id || !name || !address) {
+    if(!userId || !name || !address) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
     const addCustomer = await sql `
       INSERT INTO customers(user_id, name, address)
-            VALUES (${user_id}, ${name}, ${address})
+            VALUES (${userId}, ${name}, ${address})
             RETURNING *
     `;
 
-    console.log("Successfully added a customer for userId: ", user_id);
+    console.log("Successfully added a customer for userId: ", userId);
     res.status(200).json(addCustomer);
   } catch(error) {
     console.error("Error adding a customer for userId: ", userId, ". Error is: ", error);
