@@ -51,7 +51,7 @@ router.post("/", async(req,res) => {
   try {
     const {userId, item, base_price} = req.body;
 
-    if(!userId || !item || base_price === undefined) { // undefined === has not been given a value
+    if(!userId || !item || !base_price) { // undefined === has not been given a value
       return res.status(400).json({ message : "All fields are required"});
     }
 
@@ -66,6 +66,16 @@ router.post("/", async(req,res) => {
   } catch(error) {  
     console.error("Error creating the product", error);
     res.status(500).json({ message: "Internal server error"});
+  }
+});
+
+router.put("/", async(req,res) => {
+  try {
+    // add all fields required message
+    
+  } catch(error) {
+    console.error("Error updating the product");
+    res.status(500).json({ message: "Internal server error "});
   }
 });
 
