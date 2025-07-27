@@ -42,7 +42,7 @@ async function initDB() {
             customer_id INT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
             quantity INT NOT NULL,
             type VARCHAR(255) NOT NULL,
-            created_at DATE NOT NULL DEFAULT CURRENT_DATE
+            created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
         )`;
         
         // await sql`ALTER TABLE products RENAME COLUMN name TO item`;
