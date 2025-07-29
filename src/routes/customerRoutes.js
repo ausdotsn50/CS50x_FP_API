@@ -59,10 +59,48 @@ router.delete("/:id", async(req, res) => {
     if(result.length === 0) {
       return res.status(404).json({ message: "Customer not found"});
     }
-    res.status(200).json({ message: "Customer deleted successfully "});
+    res.status(204).json({ message: "Customer deleted successfully "});
   } catch(error) {
       console.error("Error deleting the customer: ", error);
       res.status(500).json({ message : "Internal server error"});
+  }
+});
+
+router.put("/", async(req,res) => {
+  try {
+    const { id, name, address } = req.body;
+
+    // Check for invalid or missing ID
+    if (isNaN(parseInt(id))) {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+
+    if(!name && !address) {
+      return res.status(400).json({ message: "Fill up at least one field" });
+    }
+
+    let updateResult;
+
+    if(!name && address) {
+      console.log("No name, w address");
+      updateResult = await sql`
+        UPDATE customers SET address=${address} WHERE id=${id} RETURNING *
+      `;
+    } else if(name && !address) {
+      console.log("Name, no address");
+      updateResult = await sql`
+        UPDATE customers SET name=${name} WHERE id=${id} RETURNING *
+      `;
+    } else {
+      updateResult = await sql`
+        UPDATE customers SET name=${name}, address=${address} WHERE id=${id} RETURNING *
+      `; 
+    }
+
+    res.status(200).json(updateResult);
+  } catch(error) {
+    console.error("Error updating the customer:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 

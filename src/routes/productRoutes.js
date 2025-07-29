@@ -39,7 +39,7 @@ router.delete("/:id", async(req, res) => {
     if(result.length === 0) {
       return res.status(404).json({ message: "Product not found"});
     }
-    res.status(200).json({ message: "Product deleted successfully"});
+    res.status(204).json({ message: "Product deleted successfully"});
   } catch(error) {
       console.error("Error deleting the product: ", error);
       res.status(500).json({ message : "Internal server error"});
@@ -51,7 +51,7 @@ router.post("/", async(req,res) => {
   try {
     const {userId, item, base_price} = req.body;
 
-    if(!userId || !item || !base_price) { // undefined === has not been given a value
+    if(!userId || !item || base_price === undefined) { // undefined === has not been given a value
       return res.status(400).json({ message : "All fields are required"});
     }
 
@@ -69,13 +69,47 @@ router.post("/", async(req,res) => {
   }
 });
 
-router.put("/", async(req,res) => {
+// Editing route
+router.put("/", async (req, res) => {
   try {
-    // add all fields required message
-    
-  } catch(error) {
-    console.error("Error updating the product");
-    res.status(500).json({ message: "Internal server error "});
+    const { id, item, base_price } = req.body;
+
+    // Check for invalid or missing ID
+    if (isNaN(parseInt(id))) {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+
+    // Check that at least one field is provided
+    if (!item && base_price === undefined) {
+      return res.status(400).json({ message: "Fill up at least one field" });
+    }
+
+    let updateResult;
+
+    if (!item && base_price !== undefined) {
+      // Item falsy, only update price
+      updateResult = await sql`
+        UPDATE products SET base_price = ${base_price} WHERE id = ${id}
+        RETURNING *
+      `;
+    } else if (item && base_price === undefined) {
+      // Base price undefined, only update item
+      updateResult = await sql`
+        UPDATE products SET item = ${item} WHERE id = ${id}
+        RETURNING *
+      `;
+    } else {
+      // Update both fields
+      updateResult = await sql`
+        UPDATE products SET item = ${item}, base_price = ${base_price} WHERE id = ${id}
+        RETURNING *
+      `;
+    }
+
+    res.status(200).json(updateResult);
+  } catch (error) {
+    console.error("Error updating the product:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 

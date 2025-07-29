@@ -15,6 +15,7 @@ router.get("/:userId", async (req, res) => {
             JOIN products ON orders.product_id = products.id
             WHERE orders.user_id = ${userId}
             ORDER BY created_at DESC
+            LIMIT 50
     `;
 
     console.log("Successfully fetched orders from userId: ", userId);
@@ -106,7 +107,7 @@ router.delete("/:id", async(req, res) => {
     if(result.length === 0) {
       return res.status(404).json({ message: "Order not found"});
     }
-    res.status(200).json({ message: "Order deleted successfully"});
+    res.status(204).json({ message: "Order deleted successfully"});
   } catch(error) {
       console.error("Error deleting the order: ", error);
       res.status(500).json({ message : "Internal server error"});
