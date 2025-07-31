@@ -1,6 +1,6 @@
 // Default imports
-import express from "express";
 import dotenv from "dotenv";
+import express from "express";
 
 // Specific imports from a module
 import { sql } from "./config/db.js";
@@ -9,14 +9,23 @@ import { sql } from "./config/db.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
-
+import rateLimiter from "./middleware/rateLimiter.js";
+import job from "./config/cron.js";
 
 dotenv.config();
 
 const app = express(); // Initializing an ExpressJS app
+
+if(process.env.NODE_ENV === "production") job.start();
+
+app.use(rateLimiter);
 app.use(express.json()); // A built-in middleware
 
 const PORT = process.env.PORT || 5001; // Default port: 5001
+
+app.get("api/health", (req,res) => {
+    res.status(200).json({ status: "ok" });
+});
 
 // Initializing the database
 async function initDB() {
