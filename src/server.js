@@ -23,8 +23,7 @@ app.use(express.json()); // A built-in middleware
 
 const PORT = process.env.PORT || 5001; // Default port: 5001
 
-
-app.get("api/health", (req,res) => {
+app.get("/api/health", (req,res) => {
     res.status(200).json({ status: "ok" });
 });
 
