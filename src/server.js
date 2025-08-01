@@ -16,16 +16,18 @@ dotenv.config();
 
 const app = express(); // Initializing an ExpressJS app
 
-if(process.env.NODE_ENV === "production") job.start();
+// if(process.env.NODE_ENV === "production") job.start();
 
-app.use(rateLimiter);
+// app.use(rateLimiter);
 app.use(express.json()); // A built-in middleware
 
 const PORT = process.env.PORT || 5001; // Default port: 5001
 
+/*
 app.get("api/health", (req,res) => {
     res.status(200).json({ status: "ok" });
 });
+*/
 
 // Initializing the database
 async function initDB() {
