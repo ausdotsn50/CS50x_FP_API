@@ -1,4 +1,5 @@
 // Default imports
+import cors from 'cors';
 import dotenv from "dotenv";
 import express from "express";
 
@@ -15,6 +16,8 @@ import job from "./config/cron.js";
 dotenv.config();
 
 const app = express(); // Initializing an ExpressJS app
+
+app.use(cors());
 
 if(process.env.NODE_ENV === "production") job.start();
 
