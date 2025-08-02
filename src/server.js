@@ -51,6 +51,7 @@ async function initDB() {
             customer_id INT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
             quantity INT NOT NULL,
             type VARCHAR(255) NOT NULL,
+            total_price DECIMAL(10,2) NOT NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
         )`;
         
