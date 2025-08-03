@@ -10,7 +10,7 @@ router.get("/:userId", async (req, res) => {
 
     const ordersPUser = await sql`
         SELECT orders.id, name, address, item, type,
-            base_price, quantity, created_at FROM orders
+            total_price, created_at FROM orders
             JOIN customers ON orders.customer_id = customers.id
             JOIN products ON orders.product_id = products.id
             WHERE orders.user_id = ${userId}
@@ -36,14 +36,8 @@ router.get("/summary/:userId", async (req, res) => {
     const wString = "walk in";
     
     const revTotal = await sql`
-      SELECT SUM((base_price + 
-        CASE WHEN type = ${dString} 
-          THEN 5 
-          ELSE 0
-        END) * quantity) AS rev
+      SELECT SUM(total_price) AS rev
       FROM orders
-        JOIN customers ON orders.customer_id = customers.id
-        JOIN products ON orders.product_id = products.id
         WHERE orders.user_id = ${userId} AND created_at::date = CURRENT_DATE
     `;
     
@@ -56,11 +50,7 @@ router.get("/summary/:userId", async (req, res) => {
     `;
 
     const trcQuery = await sql`
-      SELECT name, address, quantity, item, ((base_price + 
-        CASE WHEN type = ${dString} 
-          THEN 5 
-          ELSE 0
-        END) * quantity) AS rev
+      SELECT name, address, quantity, item, total_price AS rev
       FROM orders
         JOIN customers ON orders.customer_id = customers.id
         JOIN products ON orders.product_id = products.id
@@ -118,18 +108,33 @@ router.delete("/:id", async(req, res) => {
 router.post("/", async(req,res) => {
   try {
     const {userId, product_id, customer_id, quantity, type} = req.body;
+    let total_price;
 
-    if(!userId || !product_id || !customer_id || quantity === undefined) {
+    if(!userId || !product_id || !customer_id || quantity === undefined || !type) {
       return res.status(400).json({ message : "All fields are required"});
     }
 
+    const prodPrice = await sql`
+      SELECT base_price FROM products WHERE id=${product_id}
+    `;
+
+    const price = parseFloat(prodPrice[0].base_price);
+
+    if(type === "deliver") {
+      total_price = (price + 5.00) * quantity;
+    }
+    else {
+      total_price = price * quantity;
+    }
+
     const createNewOrder = await sql`
-      INSERT INTO orders(user_id, product_id, customer_id, quantity, type)
-        VALUES (${userId}, ${product_id}, ${customer_id}, ${quantity}, ${type})
+      INSERT INTO orders(user_id, product_id, customer_id, quantity, type, total_price)
+        VALUES (${userId}, ${product_id}, ${customer_id}, ${quantity}, ${type}, ${total_price})
         RETURNING *
     `;
 
-    console.log(createNewOrder[0])
+    console.log(total_price);
+    // console.log(createNewOrder[0])
     res.status(201).json(createNewOrder[0]);
   } catch(error) {
     console.error("Error creating the order", error);

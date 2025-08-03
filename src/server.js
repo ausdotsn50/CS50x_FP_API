@@ -1,4 +1,5 @@
 // Default imports
+import cors from 'cors';
 import dotenv from "dotenv";
 import express from "express";
 
@@ -16,6 +17,8 @@ dotenv.config();
 
 const app = express(); // Initializing an ExpressJS app
 
+app.use(cors());
+
 if(process.env.NODE_ENV === "production") job.start();
 
 app.use(rateLimiter);
@@ -23,7 +26,7 @@ app.use(express.json()); // A built-in middleware
 
 const PORT = process.env.PORT || 5001; // Default port: 5001
 
-app.get("api/health", (req,res) => {
+app.get("/api/health", (req,res) => {
     res.status(200).json({ status: "ok" });
 });
 
@@ -51,6 +54,7 @@ async function initDB() {
             customer_id INT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
             quantity INT NOT NULL,
             type VARCHAR(255) NOT NULL,
+            total_price DECIMAL(10,2) NOT NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
         )`;
         
